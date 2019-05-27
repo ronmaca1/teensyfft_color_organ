@@ -1,0 +1,12 @@
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+
+
+AudioInputAnalog         adc1;           
+AudioAnalyzeFFT256       fft256_1;       
+AudioConnection          patchCord1(adc1, fft256_1);
+
+
