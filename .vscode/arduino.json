@@ -1,0 +1,7 @@
+{
+    "board": "arduino:avr:pro",
+    "sketch": "m328p_single_3004_Mega328p_logger.ino",
+    "port": "COM4",
+    "output": "../build",
+    "configuration": "cpu=8MHzatmega328"
+}
