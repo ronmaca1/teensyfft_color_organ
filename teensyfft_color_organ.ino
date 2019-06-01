@@ -1,11 +1,11 @@
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
+//#include <SD.h>
+//#include <SerialFlash.h>
 
 #define AUDIO       A9
-#define RAMPRST     6
+#define RAMPRESET     6
 #define DAC1SEL     7
 #define DAC2SEL     8
 #define LDACALL     14
@@ -15,7 +15,7 @@
 //#define CONFIG4902A 0x50
 // no buffer on vref, gain of 1, shdn disabled, dac b gives us the constant below
 #define CONFIG4902B 0xF0
-// no buffer on vref, gain of 1, shdn disabled, dac b gives us the constant below
+// no buffer on vref, gain of 2, shdn disabled, dac b gives us the constant below
 //#define CONFIG4902B 0xD0
 
 
@@ -37,16 +37,16 @@ AudioConnection          patchCord1(adc1, fft256_1);
 
 void setup() {
 #ifdef _DEBUG_
-    Serial1.begin(115200);
-    Serial1.print("TEST");
+    Serial.begin(115200);
+    Serial.print("TEST");
 #endif
 
     SPI.setBitOrder(MSBFIRST);
     SPI.setClockDivider(SPI_CLOCK_DIV2);
     SPI.begin();
     AudioMemory(8);
-    pinMode(RAMPRST,OUTPUT);
-    digitalWrite(RAMPRST, HIGH);
+    pinMode(RAMPRESET,OUTPUT);
+    digitalWrite(RAMPRESET, HIGH);
     pinMode(DAC1SEL,OUTPUT);
     digitalWrite(DAC1SEL,HIGH);
     pinMode(DAC2SEL,OUTPUT);
@@ -57,6 +57,8 @@ void setup() {
     //pinMode(13,OUTPUT);
     //digitalWrite(13,LOW);
     pinMode(AUDIO,INPUT);
+    //analogReference(INTERNAL);
+    //analogReference(DEFAULT);
 }
 
 void loop() {
@@ -69,14 +71,17 @@ void loop() {
         band3=(uint8_t) (fft256_1.read(24,55)*256);
         band4=(uint8_t) (fft256_1.read(56,127)*256);
 #ifdef _DEBUG_
-        Serial1.print("\n\r");
-        Serial1.print(band1);
-        Serial1.print(',');
-        Serial1.print(band2);
-        Serial1.print(',');
-        Serial1.print(band3);
-        Serial1.print(',');
-        Serial1.print(band4);
+        Serial.print("\n\r");
+        Serial.print(band1);
+        Serial.print(',');
+        Serial.print(band2);
+        Serial.print(',');
+        Serial.print(band3);
+        Serial.print(',');
+        Serial.print(band4);
+        Serial.print("\n\r");
+        Serial.print(AudioMemoryUsageMax());
+        
 #endif
         // band 1, DAC1A
         dacoutH = CONFIG4902A | ((band1>>4) & 0x0F);
@@ -134,8 +139,8 @@ void loop() {
         delayMicroseconds(1);
         digitalWrite(LDACALL,HIGH);
     }
-    digitalWrite(RAMPRST,LOW);
+    digitalWrite(RAMPRESET,LOW);
     delayMicroseconds(100);
-    digitalWrite(RAMPRST,HIGH);
+    digitalWrite(RAMPRESET,HIGH);
     delay(8); // about 120 hz for testing, replace with zero cross detection
 }
